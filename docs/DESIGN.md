@@ -2,14 +2,14 @@
 
 ## Overview
 
-CSP Storefront is an Azure-hosted web application designed for customers of an Azure Direct CSP to manage their license allocations through a simple, user-friendly storefront interface. The solution leverages existing Entra ID authentication (AOBO) and integrates with customer billing data to provide license management without requiring separate credentials or complex processes.
+CSP Storefront is an Azure-hosted web application designed for customers of an Azure Direct CSP to manage their license allocations through a simple, user-friendly storefront interface. The solution leverages existing Microsoft Entra ID authentication and integrates with customer billing data to provide license management without requiring separate credentials or complex processes.
 
 ## Problem Statement
 
 Azure CSP customers currently need specialized knowledge or access to manage their license allocations. Existing tools may be fragmented or require administrative privileges beyond typical customer access. CSP Storefront simplifies this by providing:
 
 - A unified, intuitive storefront interface
-- Seamless authentication using customer's existing Entra ID credentials
+- Seamless authentication using customer's existing Microsoft Entra ID account credentials
 - Direct integration with billing and usage data
 - Simplified license management workflow
 
@@ -18,7 +18,7 @@ Azure CSP customers currently need specialized knowledge or access to manage the
 ### Core Capabilities
 
 1. **Entra ID Authentication**
-   - Uses customer's existing AOBO-verified Entra ID credentials
+   - Uses customer's existing Microsoft Entra ID account credentials
    - Single sign-on experience with no additional registration required
    - Token-based secure authentication
 
