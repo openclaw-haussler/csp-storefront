@@ -135,9 +135,9 @@ Azure CSP customers currently need specialized knowledge or access to manage the
 
 **Authentication Component**
 - MSAL configuration with token handling
-- Login/logout flow
-- Token refresh mechanism
 - User info display
+- Automatic authentication attempt on app load
+- Throw error if authentication fails
 
 **License Display Component**
 - Aggregate license count display
@@ -273,7 +273,7 @@ Azure CSP customers currently need specialized knowledge or access to manage the
 1. **User Engagement**
    - Daily active users
    - Session duration
-   - Login success/failure rates
+   - Authentication success/failure rates
 
 2. **System Performance**
    - API response times
