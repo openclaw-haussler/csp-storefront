@@ -58,7 +58,7 @@ Azure CSP customers currently need specialized knowledge or access to manage the
 ### Security Model
 
 1. **Authentication Security**
-   - Every login verifies AOBO relationship
+   - Every login verifies Entra ID authentication and role permissions
    - Token rotation and refresh
    - Secure session management
    - Role-based access (customer admin only)
