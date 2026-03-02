@@ -49,6 +49,26 @@ Azure CSP customers currently need specialized knowledge or access to manage the
 - **Authentication**: Token-based with Azure AD verification
 - **CORS**: Configured for Azure-hosted origins only
 
+#### Data Integration Architecture
+
+**Existing Infrastructure**:
+- **Azure Data Factory**: Handles all Partner Center API interactions
+- **Data Pipeline**: Asynchronous reconciliation data loading into data warehouse
+- **Automation**: No manual intervention required for API calls
+
+**Data Flow**:
+1. ADF triggers Partner Center API exports (billed/unbilled reconciliation)
+2. ADF polls operation status and downloads data from Azure Blob Storage
+3. ADF decompresses JSON and loads into data warehouse (PostgreSQL/SQL Server)
+4. Data warehouse contains all reconciliation line items with timestamps
+5. CSP Storefront queries data warehouse for license information
+
+**CSP Storefront Integration**:
+- Queries data warehouse via SQL/ODBC for current license quantities
+- Joins with subscription and customer data to calculate allocations
+- Real-time reads from cached database results
+- No direct API calls from CSP Storefront application
+
 #### Database Integration
 - Direct connection to existing billing/usage database
 - ODBC/ADO.NET drivers for PostgreSQL/SQL Server
@@ -68,6 +88,7 @@ Azure CSP customers currently need specialized knowledge or access to manage the
    - Rate limiting on license adjustment endpoints
    - CORS restrictions to Azure-hosted origins only
    - Audit logging of all license modifications
+   - No direct Partner Center API calls from application (handled by Azure Data Factory)
 
 3. **Data Security**
    - SSL/TLS for all communications
@@ -76,6 +97,19 @@ Azure CSP customers currently need specialized knowledge or access to manage the
    - Role-based database permissions
 
 ## Development Phases
+
+**Data Pipeline** (handled by Azure Data Factory):
+1. ADF triggers Partner Center reconciliation API exports
+2. ADF polls operation status (billed/unbilled)
+3. ADF downloads compressed JSON files from Azure Blob Storage
+4. ADF decompresses and transforms data
+5. ADF loads data into data warehouse with proper schema
+
+**CSP Storefront Data Access**:
+1. Queries data warehouse for current license allocations
+2. Uses cached results for performance
+3. Displays real-time information from database
+4. No API calls or direct Partner Center access from application layer
 
 ### Phase 1: MVP (Minimum Viable Product)
 
@@ -164,16 +198,19 @@ Azure CSP customers currently need specialized knowledge or access to manage the
 - `GET /api/auth/callback` - Entra ID callback handler
 - Token validation and user info
 
-**License Query**
-- `GET /api/licenses` - Retrieve current license allocation
+**Data Queries**
+- `GET /api/usage/current` - Retrieve current license allocations from data warehouse
   - Authorization header required
+  - Queries reconciliation data with join to subscription info
   - Returns JSON with total count and SKU breakdown
+  - Uses Redis cache for performance
 
 **License Adjustment**
 - `POST /api/licenses/adjust` - Submit license changes
   - Authorization header required
   - JSON body with SKU types and quantities
-  - Validation and database update
+  - Validates against current allocation
+  - Updates subscription (via partner API or customer portal)
   - Returns confirmation and estimated cost
 
 **Audit Log**
@@ -229,8 +266,8 @@ Azure CSP customers currently need specialized knowledge or access to manage the
    - Global CDN
    - Custom domain support
 
-2. **Azure Functions**
-   - Backend API
+2. **Azure Functions** (for CSP Storefront endpoints)
+   - License adjustment endpoints
    - Serverless execution
    - App Service Plan
    - Managed identity for Azure resources
@@ -240,8 +277,9 @@ Azure CSP customers currently need specialized knowledge or access to manage the
    - Session management
    - Rate limiting
 
-4. **Database**
-   - Existing billing/usage database
+4. **Data Warehouse** (PostgreSQL/SQL Server)
+   - Contains reconciliation data from Partner Center via Azure Data Factory
+   - Queries for license allocations and usage
    - Connection via VNET integration
    - Managed by customer's existing infrastructure
 
@@ -392,6 +430,69 @@ Azure CSP customers currently need specialized knowledge or access to manage the
 - Custom SKU support
 - AI-powered usage optimization
 - Advanced consent management
+
+## Brand Guidelines - Vervint
+
+### Color Palette
+
+**Core Colors** (Primary brand colors):
+- Plum: #33143D
+- Violet: #7D00B0
+- Yolk: #FFC95A
+- Rhubarb: #FF6A6A
+- Lilac: #C387FF
+
+**Blush Colors** (Secondary palette):
+- Paper: #FFF5EB
+- Blossom: #FFEFF9
+- Stone: #EBEBFA
+
+**Pinch Colors** (Explicit usage restriction - "Use Rarely, In A Pinch"):
+- Lime: #A0D787
+- Sky: #84CFDB
+- Pine: #277C72
+- Marine: #003C6E
+
+### Logo Usage
+- Strict adherence to provided logo guidelines
+- Clear space requirements around logo elements
+- Do not stretch, rotate, or modify logo proportions
+
+### Visual Components
+
+**Video Call Backgrounds**:
+- Only use approved Vervint video call backgrounds
+- Do not use custom or non-approved backgrounds
+- Backgrounds must maintain brand consistency
+
+**Required Templates**:
+- Use official brand templates for all communications
+- Do not create custom layouts or formatting
+
+**Approved Fonts**:
+- Use designated brand fonts for all text elements
+- Follow font hierarchy guidelines
+
+### General Brand Representation
+
+The Vervint brand emphasizes:
+- **Consistency**: All brand elements must align with official guidelines
+- **Quality**: Maintain professional appearance in all user-facing materials
+- **Vervint Identity**: Ensure all designs clearly communicate Vervint brand presence
+- **Accessibility**: Maintain sufficient contrast and readability while respecting brand colors
+
+### Design Implementation Notes
+
+**UI Design**:
+- Primary actions should use Plum or Violet
+- Secondary elements can incorporate Yolk, Rhubarb, or Lilac
+- Backgrounds should use Paper or Blossom for softer sections
+- Avoid using Pinch colors in primary user-facing elements
+
+**Documentation**:
+- Technical documentation and user interfaces must follow these color guidelines
+- Include brand guidelines reference in design review process
+- When in doubt, prioritize brand consistency over creative expression
 
 ## Conclusion
 
